@@ -34,6 +34,8 @@ jobs:
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
+        with:
+          base-path: ./frontend-workshop-react
 
       - name: Enable corepack
         run: corepack enable
@@ -55,6 +57,7 @@ jobs:
         with:
           # Upload entire repository
           path: './dist'
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
