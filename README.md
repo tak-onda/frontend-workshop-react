@@ -179,9 +179,9 @@ if (import.meta.vitest) {
 
 ```
 
-
-
 ### ロジックの分離
+
+https://github.com/tak-onda/frontend-workshop-react/tree/v2 を参考にロジックを分離してみましょう
 
 1. `state.ts` を作成します
 2. `state.test.ts` に振舞いを確認するテストを追加
