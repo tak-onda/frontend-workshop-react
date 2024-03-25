@@ -34,8 +34,6 @@ jobs:
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
-        with:
-          base-path: ./frontend-workshop-react
 
       - name: Enable corepack
         run: corepack enable
