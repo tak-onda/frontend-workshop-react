@@ -1,5 +1,8 @@
 # フロントエンド入門ワークショップ React 編
 
+<details>
+<summary>セットアップ</summary>
+
 ## 前準備
 
 ### 環境
@@ -267,4 +270,11 @@ Actions タブから deploy が走っていることを確認してください
 `https://<username>.github.io/<repository-name>/` にアクセスして、以下の画面が表示されれば成功です。
 
 ![img_2.png](img_2.png)
+
+</details>
+
+
+## TODO アプリを作ろう！
+
+デプロイするところまで確認できたら、既存ファイルをもとに TODO アプリを作成していきます。
 
