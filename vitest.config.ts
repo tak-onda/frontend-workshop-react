@@ -1,12 +1,13 @@
-import { defineConfig } from 'vite'
+/// <reference types="vitest" />
+
 import react from '@vitejs/plugin-react'
 import tsconfigPaths from 'vite-tsconfig-paths'
+import { defineConfig } from 'vitest/config'
 
-// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react(), tsconfigPaths()],
-  base: '/frontend-workshop-react/',
-  define: {
-    'import.meta.vitest': false,
+  test: {
+    includeSource: ['src/**/*.ts', 'src/**/*.tsx'],
+    globals: true,
   },
 })
