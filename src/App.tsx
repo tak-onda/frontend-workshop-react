@@ -7,7 +7,7 @@ import {
   useToggleCompleteTask,
 } from './hooks.ts'
 
-function App() {
+export function App() {
   const hasTasks = useHasTasks()
   return (
     <>
@@ -74,5 +74,3 @@ function Register() {
     </form>
   )
 }
-
-export default App
