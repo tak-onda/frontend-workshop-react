@@ -48,10 +48,10 @@ function TaskList() {
   return (
     <>
       {views.map((task) => (
-        <div key={task.id}>
+        <label key={task.id} style={{ display: 'block' }}>
           <input type="checkbox" checked={task.completed} onChange={() => toggle(task.id)} />
           {task.completed ? <s>{task.title}</s> : task.title}
-        </div>
+        </label>
       ))}
     </>
   )
