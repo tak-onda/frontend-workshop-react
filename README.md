@@ -40,6 +40,7 @@ v20.11.1
 
 ```shell
 $ corepack enable pnpm
+```
 
 
 ## プロジェクトの作成
