@@ -164,6 +164,17 @@ branch 'main' set up to track 'origin/main'.
 
 GitHub Pages にデプロイするために、以下の手順で設定を行います。
 
+### Pages の有効化
+
+GitHub のリポジトリ設定から Pages を有効化します。
+
+`https://github.com/<account>/<repository>/settings/pages`
+
+![img_3.png](img_3.png)
+
+Build and Deployment で GitHub Actions を選択してください。
+
+
 ### `vite.config.ts` の設定
 
 `base` に作成したリポジトリ名を `/<repository-name>/` として指定してください
@@ -201,31 +212,23 @@ GitHub Actions で Node.js および pnpm のバージョンを特定できる�
 以下をそのままコピーしてください。
 
 ```yaml
-# Simple workflow for deploying static content to GitHub Pages
 name: Deploy static content to Pages
 
 on:
-  # Runs on pushes targeting the default branch
   push:
     branches: ["main"]
-
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
 concurrency:
   group: "pages"
   cancel-in-progress: false
 
 jobs:
-  # Single deploy job since we're just deploying
   deploy:
     environment:
       name: github-pages
@@ -256,7 +259,6 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Upload entire repository
           path: './dist'
 
       - name: Deploy to GitHub Pages
