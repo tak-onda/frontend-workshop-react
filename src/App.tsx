@@ -53,10 +53,10 @@ function App() {
           </label>
           <hr />
           {views.map((task) => (
-            <div key={task.id}>
+            <label key={task.id} style={{ display: 'block' }}>
               <input type="checkbox" checked={task.done} onChange={() => onCheck(task)} />
               {task.done ? <s>{task.name}</s> : task.name}
-            </div>
+            </label>
           ))}
         </>
       )}
