@@ -20,33 +20,26 @@ v1 ブランチで作成した単純なアプリケーションを構造化し�
 
 具体的には:
 
- - ロジックをコンポーネントから独立させる
  - 単体テストの導入
- - コンポーネントの分割
+ - ロジックをコンポーネントから独立させる
 
 を行っていきます。
 
-## ロジックをコンポーネントから独立させる
+## 単体テストの導入
 
-[Jotai](https://jotai.org/) という状態管理ライブラリを導入します。
-
-Reactive Programming をベースにしたライブラリで、その概念の一端を知っていただくことが目的です。
-
-また、React に依存していないため単体テストが行いやすいというメリットがあります。
+[vitest](https://vitest.dev/) という単体テストフレームワークを導入します。
 
 ### ライブラリの追加
 
-ライブラリを追加します。
-
-```bash
-$ pnpm add jotai
-```
-
-ロジックを書きながら単体テストも行うので、テスト用フレームワークも導入します。
+テスト用フレームワークを導入します。
 
 ```bash
 $ pnpm add -D vitest vite-tsconfig-paths
 ```
+
+> [!NOTE]
+> Node.js における依存ライブラリは、実行時依存 (dependencies) と開発時依存 (devDependencies) を分けて管理します。
+> `-D` オプションは開発時依存に追加するためのオプションです。
 
 ### 設定ファイルの準備
 
@@ -110,7 +103,6 @@ vitest の型を解決できるようにTypeScript の設定ファイル `tsconf
 function add(a: number, b: number): number {
   return a + b
 }
-const addOne = add.bind(null, 1)
 // in-source test
 if (import.meta.vitest) {
   const { describe, it, expect } = import.meta.vitest
@@ -155,7 +147,13 @@ $ pnpm test:watch
 function add(a: number, b: number): number {
   return a + b
 }
-const addOne = add.bind(null, 1)
+function addN(a: number): number {
+  return function(b: number) {
+    return add(a, b)
+  }
+}
+const addOne = addN(1)
+// const addOne = add.bind(null, 1)
 
 if (import.meta.vitest) {
   const { describe, it, expect } = import.meta.vitest
@@ -195,9 +193,123 @@ if (import.meta.vitest) {
 
 ```
 
-### ロジックの分離
+## ロジックの分離
 
-https://github.com/tak-onda/frontend-workshop-react/tree/v2 を参考にロジックを分離してみましょう
+### フロントエンドにおける状態
+
+リクエスト・レスポンスモデルで完結するバックエンドと違い、フロントエンドではグローバルな状態を管理します。
+
+ブラウザのタブは単一のセッションに対応し、状態の寿命はタブが閉じられるまでです(SPA 遷移の場合)。
+
+バックエンドと異なり複数のユーザーの情報を並行して管理することはありませんが、寿命の長いデータを管理する必要があります。
+複雑なアプリケーションでは、データのスコープやライフサイクルをどう管理するかが設計のポイントになります。
+
+### Jotai の導入
+
+[Jotai](https://jotai.org/) という状態管理ライブラリを導入します。
+
+Reactive Programming というプログラミングパラダイムを実現したライブラリで、その概念の一端を知っていただくことが目的です。
+
+Jotai は React に依存していないため単体テストが行いやすいというメリットがあります。
+
+
+### Reactive Programming とは？
+
+ものすごく雑に説明すると[スプレッドシート](https://docs.google.com/spreadsheets/d/1HygprZZLdjU-apyTpWDOcXlMRV1BewYJQCr_bdtvl_c/edit?hl=ja#gid=0)の計算モデルです。
+
+Jotai では値を直接入力するセルに相当する値を primitive atom, 計算式に相当するセルを derived atom と呼びます。
+
+
+### ライブラリの追加
+
+ライブラリを追加します。
+
+```bash
+$ pnpm add jotai
+```
+
+### primitive atom の作成
+
+`src/atom.ts` の作成
+
+```ts
+import { atom } from 'jotai'
+
+const a = atom(0)
+const b = atom('hello')
+```
+
+テストコードの追加
+
+```ts
+if (import.meta.vitest) {
+  const { describe, it, expect } = import.meta.vitest
+  describe('atom', () => {
+    it('has initial value', () => {
+      const store = createStore()
+      expect(store.get(a)).toBe(0)
+      expect(store.get(b)).toBe('hello')
+    })
+
+    it('value change: a', () => {
+      const store = createStore()
+      expect(store.get(a)).toBe(0)
+      store.set(a, 1)
+      expect(store.get(a)).toBe(1)
+    })
+
+    it('value change: b', () => {
+      const store = createStore()
+      expect(store.get(b)).toBe('hello')
+      store.set(b, (current) => current + ' world')
+      expect(store.get(b)).toBe('hello world')
+    })
+  })
+}
+```
+
+> [!NOTE]
+> Jotai では atom は雛形で、実際の値は store の中に保持されます。
+> (React だと Context で store を管理します)
+> 
+> ```ts
+> describe('jotai store', () => {
+>   it('dependant', () => {
+>     const store1 = createStore()
+>     const store2 = createStore()
+>     expect(store1.get(a)).toBe(0)
+>     store1.set(a, 1)
+>     expect(store1.get(a)).toBe(1)
+>     expect(store2.get(a)).toBe(0)
+>   })
+> })
+> ```
+
+### derived atom の作成
+
+derived atom を追加してみましょう。
+
+```ts
+const aPlus1 = atom((get) => get(a) + 1)
+
+describe('derived atom', () => {
+  it('dependant', () => {
+    const store = createStore()
+    expect(store.get(a)).toBe(0)
+    expect(store.get(aPlus1)).toBe(1)
+    store.set(a, 10)
+    expect(store.get(a)).toBe(10)
+    expect(store.get(aPlus1)).toBe(11)
+  })
+})
+```
+ 
+ 
+## 実践
+
+TODO のロジックを下記リポジトリを参考に分離してみましょう。
+
+https://github.com/tak-onda/frontend-workshop-react/tree/v2 
 
 1. `state.ts` を作成します
 2. `state.test.ts` に振舞いを確認するテストを追加
